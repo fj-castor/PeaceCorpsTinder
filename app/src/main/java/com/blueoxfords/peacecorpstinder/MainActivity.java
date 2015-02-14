@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -35,6 +37,7 @@ import com.blueoxfords.RestClient;
 import com.blueoxfords.models.Image;
 import com.blueoxfords.models.KeywordPairing;
 import com.blueoxfords.models.VolunteerOpening;
+import com.parse.ParseFacebookUtils;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -43,6 +46,10 @@ import retrofit.client.Response;
 
 public class MainActivity extends Activity {
     private CardContainer mCardContainer;
+
+    public static void start(Context c) {
+        c.startActivity(new Intent(c, MainActivity.class));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,5 +134,11 @@ public class MainActivity extends Activity {
 //
 //        adapter.add(cardModel);
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ParseFacebookUtils.finishAuthentication(requestCode, resultCode, data);
     }
 }
