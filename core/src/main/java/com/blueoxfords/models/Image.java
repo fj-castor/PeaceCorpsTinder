@@ -5,6 +5,6 @@ package com.blueoxfords.models;
  */
 public class Image {
 
-    public String url;
+    public String url_m;
 
 }

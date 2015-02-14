@@ -82,14 +82,16 @@ public class TinderFragment extends Fragment {
                     final KeywordPairing pairing = opening;
                     Log.d("Pairing", pairing.volunteerOpening.title);
 
-                    ImageRestClient.get().getImagesFromKeyword(opening.keyword, new Callback<ImageService.ImageResponseWrapper>() {
+                    String keyword = opening.keyword;
+
+                    ImageRestClient.get().getImagesFromKeyword(keyword, new Callback<ImageService.ImageResponseWrapper>() {
                         @Override
                         public void success(ImageService.ImageResponseWrapper imageResponseWrapper, Response response) {
-                            List<Image> images = imageResponseWrapper.responseData.results;
-                            String url = "http://i.imgur.com/DvpvklR.png"; // Default image
+                            List<Image> images = imageResponseWrapper.photos.photo;
+                            String url = "http://i.imgur.com/DvpvklR.png";
                             if (images.size() > 0) {
-                                Log.d("URLTESTING", images.get(0).url);
-                                url = images.get(0).url;
+                                Log.d("TESTING", images.get(0).url_m);
+                                url = images.get(0).url_m;
                             }
                             final CardModel card = new CardModel(pairing.volunteerOpening.title, pairing.keyword, url, indice, pairing.volunteerOpening);
                             Log.d("PairName", pairing.volunteerOpening.title + " " + pairing.volunteerOpening.country);
@@ -133,7 +135,6 @@ public class TinderFragment extends Fragment {
 
                         @Override
                         public void failure(RetrofitError error) {
-
                         }
                     });
                 }

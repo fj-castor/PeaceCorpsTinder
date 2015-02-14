@@ -14,13 +14,13 @@ import retrofit.http.Query;
  */
 public interface ImageService {
     public static class ImageResponseWrapper {
-        public ImageResultsWrapper responseData;
+        public ImageResultsWrapper photos;
     }
 
     public static class ImageResultsWrapper {
-        public List<Image> results;
+        public List<Image> photo;
     }
 
-    @GET("/images?v=1.0")
-    void getImagesFromKeyword(@Query("q") String q, Callback<ImageResponseWrapper> response);
+    @GET("/rest?method=flickr.photos.search&api_key=82accfa8682763d29787a8f3c01079e0&per_page=1&extras=url_m&format=json&nojsoncallback=1&sort=relevance&safe_search=1&content_type=1")
+    void getImagesFromKeyword(@Query("text") String q, Callback<ImageResponseWrapper> response);
 }
