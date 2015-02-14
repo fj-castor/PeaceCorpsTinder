@@ -3,6 +3,7 @@ package com.blueoxfords.peacecorpstinder;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,7 +26,14 @@ import com.blueoxfords.RestClient;
 import com.blueoxfords.models.Image;
 import com.blueoxfords.models.KeywordPairing;
 import com.blueoxfords.models.VolunteerOpening;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -100,6 +108,7 @@ public class TinderFragment extends Fragment {
                                 @Override
                                 public void onDislike(View topCard) {
                                     String id =  (String) ((TextView)topCard.findViewById(R.id.req_id)).getText();
+                                    String url =  (String) ((TextView)topCard.findViewById(R.id.url)).getText();
                                     int curScore = scoreMap.get(id) + 1;
                                     scoreMap.put(id, curScore);
                                     Log.d("CARD SWIPED", card.opening.title + " " + card.opening.country);
@@ -113,7 +122,7 @@ public class TinderFragment extends Fragment {
                                     }
                                     if (curScore == 3) {
                                         Log.d("OHSHIT", "YOU GOT MATCHED UP WITH "+idMap.get(id).title + " " + idMap.get(id).country);
-                                        match(topCard, idMap.get(id));
+                                        match(topCard, idMap.get(id), url);
                                     }
                                 }
 
@@ -145,10 +154,42 @@ public class TinderFragment extends Fragment {
         });
     }
 
-    public static void match(View view, VolunteerOpening opening) {
+    public static void match(View view, final VolunteerOpening opening, String url) {
         AlertDialog.Builder builder = new AlertDialog.Builder(TinderFragment.context);
         ImageView iv = (ImageView) view.findViewById(R.id.image);
         ((LinearLayout) iv.getParent()).removeView(iv);
+
+        ParseQuery<ParseObject> openingQ = ParseQuery.getQuery("Match");
+        openingQ.whereEqualTo("opening", opening.req_id);
+        openingQ.whereEqualTo("user2", null);
+
+        final String urls = url;
+
+        openingQ.getFirstInBackground(new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (object == null) {
+
+                    //Create new doc
+                    ParseObject newMatch = new ParseObject("Match");
+                    newMatch.put("opening", opening.req_id);
+                    newMatch.put("title", opening.title);
+                    newMatch.put("user1", ParseUser.getCurrentUser());
+                    newMatch.put("pictureUrl", urls);
+                    newMatch.put("country", opening.country);
+
+                    newMatch.saveInBackground();
+
+                    Log.d("score", "The getFirst request failed.");
+                } else {
+                    // doc exists add to user2
+
+                    object.put("user2", ParseUser.getCurrentUser());
+                    object.saveInBackground();
+
+                    Log.d("score", "Retrieved the object.");
+                }
+            }
+        });
 
 
         builder.setTitle("You've been matched with \n " + opening.title + "\n");
@@ -156,6 +197,12 @@ public class TinderFragment extends Fragment {
         builder.setPositiveButton("View matches!", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked OK button
+
+                Intent intent = new Intent(TinderFragment.context, DetailActivity.class);
+                intent.putExtra("title", opening.title);
+
+                TinderFragment.context.startActivity(intent);
+
             }
         });
         builder.setNegativeButton("Keep swiping!", new DialogInterface.OnClickListener() {
