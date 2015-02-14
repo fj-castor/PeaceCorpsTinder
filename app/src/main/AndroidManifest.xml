@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.blueoxfords.peacecorpstinder" >
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -8,8 +9,9 @@
     <application
         android:name=".PeaceCorpsApplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/pc_logo"
         android:label="@string/app_name"
+        tools:replace="android:icon,android:theme"
         android:theme="@style/MegaphoneActionBarTheme" >
         <activity
             android:name=".LoginActivity"

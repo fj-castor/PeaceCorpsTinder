@@ -2,9 +2,9 @@
 <resources>
 
     <array name="tab_icons">
-        <item>@drawable/feed_icon</item>
-        <item>@drawable/broadcast_icon</item>
-        <item>@drawable/edit_profile_icon</item>
+        <item>@drawable/swipselogo</item>
+        <item>@drawable/matcheslogo</item>
+        <item>@drawable/usericon</item>
     </array>
 
     <array name="tab_titles">
