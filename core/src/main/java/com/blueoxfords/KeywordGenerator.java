@@ -191,19 +191,27 @@ public class KeywordGenerator {
             "your",
             "yours",
             "yourself",
-            "yourselves"
+            "yourselves",
+            "•",
+            "&amp;"
     };
     //endregion
 
     public static final List<String> STOP_WORDS = Arrays.asList(STOP_WORDS_ARRAY);
 
+    public static List<String> keywordsAdded;
+    public static List<String> countriesAdded;
+
     public static List<KeywordPairing> generate(List<VolunteerOpening> openings) {
+        keywordsAdded = new ArrayList<String>();
+        countriesAdded = new ArrayList<String>();
         List<KeywordPairing> keywordPairings = new ArrayList<>();
 
         for (VolunteerOpening opening : openings) {
 
             // skills
             String determinedSkillKeyword = determineKeywordFromText(opening.required_skills + " " + opening.desired_skills);
+            keywordsAdded.add(determinedSkillKeyword);
             String skillKeyword;
             if (opening.language_skills.equals("none")) {
                 skillKeyword = determinedSkillKeyword;
@@ -213,11 +221,16 @@ public class KeywordGenerator {
             keywordPairings.add(new KeywordPairing(skillKeyword, opening));
 
             // location
-            keywordPairings.add(new KeywordPairing(opening.country + " " + "culture", opening));
+            if (!countriesAdded.contains(opening.country)) {
+                keywordPairings.add(new KeywordPairing(opening.country + " " + "culture", opening));
+                countriesAdded.add(opening.country);
+            }
 
             // type of work
             String titleKeyword = determineKeywordFromText(opening.title);
+            keywordsAdded.add(titleKeyword);
             String descriptionKeyword = determineKeywordFromText(opening.project_description);
+            keywordsAdded.add(descriptionKeyword);
             keywordPairings.add(new KeywordPairing(opening.sector + " " + titleKeyword + " " + descriptionKeyword, opening));
         }
 
@@ -239,7 +252,7 @@ public class KeywordGenerator {
         for (Map.Entry<String, Integer> entry : wordCount.entrySet()) {
             if (highest == null) {
                 highest = entry;
-            } else if (entry.getValue() >= highest.getValue()) {
+            } else if (entry.getValue() >= highest.getValue() && !keywordsAdded.contains(entry.getKey())) {
                 highest = entry;
             }
         }
