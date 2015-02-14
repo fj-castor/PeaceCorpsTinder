@@ -10,7 +10,7 @@ import retrofit.client.OkClient;
  */
 public class ImageRestClient {
     private static ImageService REST_CLIENT;
-    private static String ROOT = "https://ajax.googleapis.com/ajax/services/search";
+    private static String ROOT = "https://www.flickr.com/services";
 
     static {
         setupRestClient();

@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.parse.FindCallback;
@@ -18,6 +19,7 @@ import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -79,6 +81,12 @@ public class MatchFragment extends ListFragment implements SwipeRefreshLayout.On
         ImageView broadcastImage;
     }
 
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        super.onListItemClick(l, v, position, id);
+        MatchActivity.start(getActivity(), adapter.getItem(position).getObjectId());
+    }
+
     private class FeedAdapter extends BaseAdapter implements ListAdapter {
 
         private final Context context;
@@ -105,11 +113,11 @@ public class MatchFragment extends ListFragment implements SwipeRefreshLayout.On
         }
 
         public void refresh() {
-            ParseQuery<ParseObject> lotsOfWins = ParseQuery.getQuery("Player");
+            ParseQuery<ParseObject> lotsOfWins = ParseQuery.getQuery("Match");
             lotsOfWins.whereEqualTo("user1", ParseUser.getCurrentUser());
 
-            ParseQuery<ParseObject> fewWins = ParseQuery.getQuery("Player");
-            fewWins.whereLessThan("user2", ParseUser.getCurrentUser());
+            ParseQuery<ParseObject> fewWins = ParseQuery.getQuery("Match");
+            fewWins.whereEqualTo("user2", ParseUser.getCurrentUser());
 
             List<ParseQuery<ParseObject>> queries = new ArrayList<>();
             queries.add(lotsOfWins);
@@ -157,6 +165,7 @@ public class MatchFragment extends ListFragment implements SwipeRefreshLayout.On
 //
 //                }
 //            });
+
         }
 
         @Override
@@ -178,7 +187,10 @@ public class MatchFragment extends ListFragment implements SwipeRefreshLayout.On
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
-//            viewHolder.broadcastName.setText(getItem(position).getString("title"));
+            viewHolder.broadcastName.setText(getItem(position).getString("title"));
+            String url = getItem(position).getString("pictureUrl");
+            Picasso.with(getActivity()).load(url).into(viewHolder.broadcastImage);
+            viewHolder.broadcastDistance.setText(getItem(position).getString("country"));
 //            Double distance = distances.get(getItem(position));
 //            if (distance != null) {
 //                if (distance < 0.05) {
