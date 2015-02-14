@@ -6,4 +6,5 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp:2.0.0'
     compile 'com.squareup.okio:okio:1.0.1'
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    testCompile 'junit:junit:4.11'
 }
