@@ -17,7 +17,6 @@ import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 /**
  * Created by soheil on 15-02-14.
@@ -50,7 +49,7 @@ public class LoginActivity extends Activity {
             @Override
             public void done(ParseUser user, ParseException err) {
                 if (user == null) {
-                    Log.d("com.amplifyme", "The user cancelled the Facebook login.");
+                    Log.d("com.blueoxfords.peacecorpstinder", "The user cancelled the Facebook login.");
                 } else {
                     if (user.isNew()) {
                         updateProfile(user);

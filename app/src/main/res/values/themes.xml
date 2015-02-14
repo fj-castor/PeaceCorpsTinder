@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="MegaphoneActionBarTheme"
+        parent="@android:style/Theme.Holo.Light">
+        <item name="android:actionBarStyle">@style/MegaphoneActionBar</item>
+        <item name="android:actionBarTabStyle">@style/MegaphoneTabStyle</item>
+        <item name="android:actionBarTabBarStyle">@style/MegaphoneTabBar</item>
+    </style>
+
+    <style name="MegaphoneActionBar"
+        parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/red</item>
+        <item name="android:backgroundStacked">@color/tab_grey</item>
+    </style>
+
+    <style name="MegaphoneTabStyle"
+        parent="@android:style/Widget.Holo.Light.ActionBar.TabView">
+        <!-- Tab selected indicator -->
+        <item name="android:background">@drawable/tab_background</item>
+    </style>
+
+    <style name="MegaphoneTabBar"
+        parent="@android:style/Widget.Holo.Light.ActionBar.TabBar">
+    </style>
+
+</resources>

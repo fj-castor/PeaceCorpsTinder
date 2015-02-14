@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="tab_icons">
+        <item>@drawable/feed_icon</item>
+        <item>@drawable/broadcast_icon</item>
+        <item>@drawable/edit_profile_icon</item>
+    </array>
+
+    <array name="tab_titles">
+        <item>@string/tab_tinder_title</item>
+        <item>@string/tab_matches_title</item>
+        <item>@string/tab_profile_title</item>
+    </array>
+
+</resources>

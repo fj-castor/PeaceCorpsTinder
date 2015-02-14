@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="red">#FF1F1F</color>
+    <color name="tab_grey">#F7F7F7</color>
+    <color name="tab_icon_unselected_grey">#999999</color>
+</resources>

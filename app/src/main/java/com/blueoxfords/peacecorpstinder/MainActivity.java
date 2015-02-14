@@ -1,51 +1,38 @@
 package com.blueoxfords.peacecorpstinder;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-
-import android.app.Activity;
+import android.app.ActionBar;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.widget.TextView;
 
-import com.andtinder.model.CardModel;
-import com.andtinder.view.CardContainer;
-import com.andtinder.view.SimpleCardStackAdapter;
-import com.blueoxfords.ImageRestClient;
-import com.blueoxfords.ImageService;
-import com.blueoxfords.KeywordGenerator;
-import com.blueoxfords.PeaceCorpsService;
-import com.blueoxfords.RestClient;
-import com.blueoxfords.models.Image;
-import com.blueoxfords.models.KeywordPairing;
-import com.blueoxfords.models.VolunteerOpening;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseUser;
 
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 
-public class MainActivity extends Activity {
-    private CardContainer mCardContainer;
+public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
+
+    AppSectionsPagerAdapter mAppSectionsPagerAdapter;
+
+    ViewPager mViewPager;
 
     public static void start(Context c) {
         c.startActivity(new Intent(c, MainActivity.class));
@@ -54,86 +41,105 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_main);
 
-        mCardContainer = (CardContainer) findViewById(R.id.layoutview);
+        mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(this, getSupportFragmentManager());
 
-        final SimpleCardStackAdapter adapter = new SimpleCardStackAdapter(this);
+        mViewPager = (ViewPager) findViewById(R.id.pager);
+        mViewPager.setAdapter(mAppSectionsPagerAdapter);
+        mViewPager.setOffscreenPageLimit(2);
 
+        final ActionBar actionBar = getActionBar();
 
-        RestClient.get().getVolunteerOpening(new Callback<PeaceCorpsService.OpeningsWrapper>() {
-            @Override
-            public void success(PeaceCorpsService.OpeningsWrapper openingsWrapper, Response response) {
+        if (actionBar != null) {
+            actionBar.setHomeButtonEnabled(false);
+            actionBar.setTitle(getString(R.string.app_name));
+            actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-                List<VolunteerOpening> volunteerOpeningList =  openingsWrapper.results.subList(0, 9);
-                List<KeywordPairing> keywordPairingList = KeywordGenerator.generate(volunteerOpeningList);
-
-                for (KeywordPairing opening : keywordPairingList) {
-
-                    final KeywordPairing pairing = opening;
-
-                    ImageRestClient.get().getImagesFromKeyword(opening.keyword, new Callback<ImageService.ImageResponseWrapper>() {
-                        @Override
-                        public void success(ImageService.ImageResponseWrapper imageResponseWrapper, Response response) {
-                            List<Image> images = imageResponseWrapper.responseData.results;
-                            String url = "http://i.imgur.com/DvpvklR.png";
-                            if (images.size() > 0) {
-                                Log.d("TESTING", images.get(0).url);
-                                url = images.get(0).url;
-                            }
-                            adapter.add(new CardModel(pairing.volunteerOpening.title, pairing.keyword, url));
-                            mCardContainer.setAdapter(adapter);
-                        }
-
-
-
-                        @Override
-                        public void failure(RetrofitError error) {
-
-                        }
-                    });
-
-
+            mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+                @Override
+                public void onPageSelected(int position) {
+                    actionBar.setSelectedNavigationItem(position);
                 }
+            });
 
-
-
-
-
-
+            for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
+                actionBar.addTab(
+                        actionBar.newTab()
+                                .setIcon(mAppSectionsPagerAdapter.getPageIcon(i))
+                                .setTabListener(this));
             }
+        }
+    }
 
-            @Override
-            public void failure(RetrofitError error) {
+    @Override
+    protected void onResume() {
+        super.onResume();
 
+        if (ParseUser.getCurrentUser() == null) {
+            LoginActivity.start(this);
+        }
+    }
+
+    @Override
+    public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft) {
+        mViewPager.setCurrentItem(tab.getPosition());
+        if (getActionBar() != null) {
+            getActionBar().setTitle(mAppSectionsPagerAdapter.getPageTitle(tab.getPosition()));
+        }
+        tab.getIcon().setColorFilter(getResources().getColor(R.color.red), PorterDuff.Mode.SRC_ATOP);
+    }
+
+    @Override
+    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft) {
+        tab.getIcon().setColorFilter(getResources().getColor(R.color.tab_icon_unselected_grey), PorterDuff.Mode.SRC_ATOP);
+    }
+
+    @Override
+    public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
+    }
+
+    public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
+
+        Context context;
+
+        public AppSectionsPagerAdapter(Context c, FragmentManager fm) {
+            super(fm);
+            context = c;
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
+
+        @Override
+        public Fragment getItem(int i) {
+            switch (i) {
+                case 0:
+                    return TinderFragment.instantiate(context, TinderFragment.class.getName());
+
+                case 1:
+                    return MatchFragment.instantiate(context, MatchFragment.class.getName());
+
+                case 2:
+                    return ProfileFragment.instantiate(context,ProfileFragment.class.getName());
+
+                default:
+                    return null;
             }
-        });
+        }
 
-//        adapter.add(new CardModel("Title1", "Description goes here", r.getDrawable(R.drawable.pizza_slice)));
-//
-//        CardModel cardModel = new CardModel("Title1", "Description goes here", r.getDrawable(R.drawable.pastrami));
-//        cardModel.setOnClickListener(new CardModel.OnClickListener() {
-//            @Override
-//            public void OnClickListener() {
-//                Log.i("Swipeable Cards","I am pressing the card");
-//            }
-//        });
-//
-//        cardModel.setOnCardDimissedListener(new CardModel.OnCardDimissedListener() {
-//            @Override
-//            public void onLike() {
-//                Log.i("Swipeable Cards", "I like the card");
-//            }
-//
-//            @Override
-//            public void onDislike() {
-//                Log.i("Swipeable Cards","I dislike the card");
-//            }
-//        });
-//
-//        adapter.add(cardModel);
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return context.getResources().obtainTypedArray(R.array.tab_titles).getString(position);
+        }
 
+        public Drawable getPageIcon(int position) {
+            Drawable icon = context.getResources().obtainTypedArray(R.array.tab_icons).getDrawable(position);
+            icon.setColorFilter(context.getResources().getColor(R.color.tab_icon_unselected_grey), PorterDuff.Mode.SRC_ATOP);
+            return icon;
+        }
     }
 
     @Override
