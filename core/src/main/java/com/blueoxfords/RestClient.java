@@ -1,9 +1,12 @@
 package com.blueoxfords;
 
+import com.blueoxfords.models.Image;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.okhttp.OkHttpClient;
 
 import retrofit.RestAdapter;
+import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
 
 /**
@@ -30,6 +33,7 @@ public class RestClient {
 
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(ROOT).setConverter(new GsonConverter(gson))
+                .setClient(new OkClient(new OkHttpClient()))
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .build();
 

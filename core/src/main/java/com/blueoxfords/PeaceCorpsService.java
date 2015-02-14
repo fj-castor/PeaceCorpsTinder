@@ -4,6 +4,7 @@ import com.blueoxfords.models.VolunteerOpening;
 
 import java.util.List;
 
+import retrofit.Callback;
 import retrofit.http.GET;
 
 /**
@@ -17,5 +18,8 @@ public interface PeaceCorpsService {
 
     @GET("/openings")
     OpeningsWrapper getVolunteerOpenings();
+
+    @GET("/openings")
+    void getVolunteerOpening(Callback<OpeningsWrapper> response);
 
 }
