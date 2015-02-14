@@ -26,6 +26,7 @@ public class CardModel {
 
 	private String   title;
 	private String   description;
+    public  String   url;
 	private Drawable cardImageDrawable;
 	private Drawable cardLikeImageDrawable;
 	private Drawable cardDislikeImageDrawable;
@@ -58,6 +59,12 @@ public class CardModel {
 		this.description = description;
 		this.cardImageDrawable = new BitmapDrawable(null, cardImage);
 	}
+
+    public CardModel(String title, String description, String url) {
+        this.title = title;
+        this.description = description;
+        this.url = url;
+    }
 
 	public String getTitle() {
 		return title;
