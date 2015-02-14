@@ -28,7 +28,8 @@ public final class SimpleCardStackAdapter extends CardStackAdapter {
         Picasso.with(this.getContext()).load(model.url).into((ImageView) convertView.findViewById(R.id.image));
 
         //((ImageView) convertView.findViewById(R.id.image)).setImageDrawable(model.getCardImageDrawable());
-                ((TextView) convertView.findViewById(R.id.title)).setText(model.getTitle());
+               // ((TextView) convertView.findViewById(R.id.title)).setText(model.getTitle());
+        ((TextView) convertView.findViewById(R.id.req_id)).setText(model.req_id);
 		((TextView) convertView.findViewById(R.id.description)).setText(model.getDescription());
 
 		return convertView;

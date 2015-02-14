@@ -445,6 +445,7 @@ public class CardContainer extends AdapterView<ListAdapter> {
 
 				duration = Math.min(500, duration);
 
+
 				mTopCard = getChildAt(getChildCount() - 2);
                 CardModel cardModel = (CardModel)getAdapter().getItem(0);
 
@@ -453,9 +454,9 @@ public class CardContainer extends AdapterView<ListAdapter> {
 
                 if (cardModel.getOnCardDimissedListener() != null) {
                     if ( targetX > 0 ) {
-                        cardModel.getOnCardDimissedListener().onDislike();
+                        cardModel.getOnCardDimissedListener().onDislike(topCard);
                     } else {
-                        cardModel.getOnCardDimissedListener().onLike();
+                        cardModel.getOnCardDimissedListener().onLike(topCard);
                     }
                 }
 

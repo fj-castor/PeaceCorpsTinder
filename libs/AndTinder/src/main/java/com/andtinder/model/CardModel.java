@@ -21,12 +21,21 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
+import android.view.View;
+
+import com.blueoxfords.models.VolunteerOpening;
+
+import java.util.HashMap;
 
 public class CardModel {
 
 	private String   title;
 	private String   description;
     public  String   url;
+    public int id;
+    public String req_id;
+    public VolunteerOpening opening;
 	private Drawable cardImageDrawable;
 	private Drawable cardLikeImageDrawable;
 	private Drawable cardDislikeImageDrawable;
@@ -36,8 +45,8 @@ public class CardModel {
     private OnClickListener mOnClickListener = null;
 
     public interface OnCardDimissedListener {
-        void onLike();
-        void onDislike();
+        void onLike(View topCard);
+        void onDislike(View topCard);
     }
 
     public interface OnClickListener {
@@ -60,10 +69,13 @@ public class CardModel {
 		this.cardImageDrawable = new BitmapDrawable(null, cardImage);
 	}
 
-    public CardModel(String title, String description, String url) {
+    public CardModel(String title, String description, String url, int id, VolunteerOpening opening) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.url = url;
+        this.opening = opening;
+        this.req_id = opening.req_id;
     }
 
 	public String getTitle() {
@@ -81,6 +93,23 @@ public class CardModel {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+    public static void swipeRight(HashMap<VolunteerOpening, Integer> scoreMap, CardModel card) {
+        int curScore = scoreMap.get(card.opening) + 1;
+        scoreMap.put(card.opening, curScore);
+        Log.d("CARD SWIPED", card.opening.title + " " + card.opening.country);
+        for (VolunteerOpening name: scoreMap.keySet()){
+
+            String key = name.title.toString();
+            String value = scoreMap.get(name).toString();
+            Log.d("SCOREMAP",key + " " + value);
+
+
+        }
+        if (curScore == 3) {
+            Log.d("OHSHIT", "YOU GOT MATCHED UP WITH "+card.opening.title);
+        }
+    }
 
 	public Drawable getCardImageDrawable() {
 		return cardImageDrawable;
