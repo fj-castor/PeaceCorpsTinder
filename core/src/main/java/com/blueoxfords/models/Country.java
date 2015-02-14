@@ -42,4 +42,9 @@ public class Country {
             mobile_country_page_url,
             country_site_url;
 
+    @Override
+    public int hashCode() {
+        return id;
+    }
+
 }

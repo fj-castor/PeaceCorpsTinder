@@ -39,4 +39,9 @@ public class VolunteerOpening {
             country_flag_image,
             opening_url;
 
+    @Override
+    public int hashCode() {
+        return req_id.hashCode();
+    }
+
 }

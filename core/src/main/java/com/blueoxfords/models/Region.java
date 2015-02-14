@@ -13,4 +13,8 @@ public class Region {
             description,
             region_page_url;
 
+    @Override
+    public int hashCode() {
+        return id;
+    }
 }
