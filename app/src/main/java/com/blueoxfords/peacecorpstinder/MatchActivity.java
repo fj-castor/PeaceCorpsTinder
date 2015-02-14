@@ -150,7 +150,7 @@ public class MatchActivity extends FragmentActivity implements ActionBar.TabList
         public Fragment getItem(int i) {
             switch (i) {
                 case 0:
-                    return new Fragment();
+                    return OpeningDetailsFragment.newInstance(match.getString("opening"), matchId);
 
                 case 1:
                     return new Fragment();
