@@ -153,7 +153,7 @@ public class MatchActivity extends FragmentActivity implements ActionBar.TabList
                     return OpeningDetailsFragment.newInstance(match.getString("opening"), matchId);
 
                 case 1:
-                    return new Fragment();
+                    return ChatFragment.newInstance(matchId);
 
                 default:
                     return null;
@@ -162,7 +162,7 @@ public class MatchActivity extends FragmentActivity implements ActionBar.TabList
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return context.getResources().obtainTypedArray(R.array.tab_titles).getString(position);
+            return context.getResources().obtainTypedArray(R.array.match_tab_titles).getString(position);
         }
 
         public Drawable getPageIcon(int position) {

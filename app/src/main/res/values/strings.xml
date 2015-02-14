@@ -13,4 +13,7 @@
     <string name="tab_matches_title">Matches</string>
     <string name="tab_profile_title">Profile</string>
 
+    <string name="tab_opening_title">Volunteer Opening Details</string>
+    <string name="tab_opening_match_title">Match</string>
+
 </resources>
