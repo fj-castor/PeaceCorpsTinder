@@ -1,3 +1,2 @@
 include ':app', ':core', ':AndTinder'
-include ':libs/AndTinder'
-project(':AndTinder').projectDir = new File('libs/AndTinder')
+project(':AndTinder').projectDir = new File('app/libs/AndTinder')
