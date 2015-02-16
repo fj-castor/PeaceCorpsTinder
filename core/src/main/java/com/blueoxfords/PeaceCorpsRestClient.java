@@ -12,7 +12,7 @@ import retrofit.converter.GsonConverter;
 /**
  * Created by fjcastor on 15-02-14.
  */
-public class RestClient {
+public class PeaceCorpsRestClient {
     private static PeaceCorpsService REST_CLIENT;
     private static String ROOT = "http://www.peacecorps.gov/api/v1";
 
@@ -20,7 +20,7 @@ public class RestClient {
         setupRestClient();
     }
 
-    private RestClient() {}
+    private PeaceCorpsRestClient() {}
 
     public static PeaceCorpsService get() {
         return REST_CLIENT;

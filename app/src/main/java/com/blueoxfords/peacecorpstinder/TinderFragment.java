@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -22,19 +21,17 @@ import com.andtinder.view.SimpleCardStackAdapter;
 import com.blueoxfords.ImageRestClient;
 import com.blueoxfords.ImageService;
 import com.blueoxfords.KeywordGenerator;
+import com.blueoxfords.PeaceCorpsRestClient;
 import com.blueoxfords.PeaceCorpsService;
-import com.blueoxfords.RestClient;
 import com.blueoxfords.models.Image;
 import com.blueoxfords.models.KeywordPairing;
 import com.blueoxfords.models.VolunteerOpening;
-import com.parse.FindCallback;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -101,7 +98,7 @@ public class TinderFragment extends Fragment {
 
         final HashMap<String, VolunteerOpening>idMap = new HashMap<String, VolunteerOpening>();
         final HashMap<String, Integer>scoreMap = new HashMap<String, Integer>();
-        RestClient.get().getVolunteerOpening(new Callback<PeaceCorpsService.OpeningsWrapper>() {
+        PeaceCorpsRestClient.get().getVolunteerOpening(new Callback<PeaceCorpsService.OpeningsWrapper>() {
             @Override
             public void success(PeaceCorpsService.OpeningsWrapper openingsWrapper, Response response) {
 

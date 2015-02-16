@@ -10,7 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.blueoxfords.RestClient;
+import com.blueoxfords.PeaceCorpsRestClient;
 import com.blueoxfords.models.VolunteerOpening;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -60,7 +60,7 @@ public class OpeningDetailsFragment extends Fragment {
 
         Picasso.with(getActivity()).load(match.getString("pictureUrl")).into((ImageView) view.findViewById(R.id.imageView));
 
-        RestClient.get().getVolunteerOpening(getArguments().getString("req_id"), new Callback<VolunteerOpening>() {
+        PeaceCorpsRestClient.get().getVolunteerOpening(getArguments().getString("req_id"), new Callback<VolunteerOpening>() {
             @Override
             public void success(VolunteerOpening volunteerOpening, Response response) {
                 opening = volunteerOpening;
