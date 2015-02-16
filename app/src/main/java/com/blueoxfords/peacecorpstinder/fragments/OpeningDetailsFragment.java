@@ -3,6 +3,8 @@ package com.blueoxfords.peacecorpstinder.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +68,8 @@ public class OpeningDetailsFragment extends Fragment {
             public void success(VolunteerOpening volunteerOpening, Response response) {
                 opening = volunteerOpening;
                 ((TextView) view.findViewById(R.id.title)).setText(opening.title);
+                ((TextView) view.findViewById(R.id.link)).setText(Html.fromHtml("<a href=\"" + opening.opening_url + "\"><b>View Opening Online</b></a>"));
+                ((TextView) view.findViewById(R.id.link)).setMovementMethod(LinkMovementMethod.getInstance());
                 ((TextView) view.findViewById(R.id.description)).setText(opening.project_description);
             }
 

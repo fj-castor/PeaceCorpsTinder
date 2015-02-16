@@ -192,7 +192,10 @@ public class MatchFragment extends ListFragment implements SwipeRefreshLayout.On
             viewHolder.broadcastName.setText(getItem(position).getString("title"));
             String url = getItem(position).getString("pictureUrl");
             Picasso.with(getActivity()).load(url).into(viewHolder.broadcastImage);
-            viewHolder.broadcastDistance.setText(getItem(position).getString("country"));
+
+            String country = getItem(position).getString("country");
+            String countryCapped = Character.toUpperCase(country.charAt(0)) + country.substring(1);
+            viewHolder.broadcastDistance.setText(countryCapped);
 //            Double distance = distances.get(getItem(position));
 //            if (distance != null) {
 //                if (distance < 0.05) {
