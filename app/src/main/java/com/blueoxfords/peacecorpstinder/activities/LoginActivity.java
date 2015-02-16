@@ -16,6 +16,7 @@ import com.facebook.model.GraphUser;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseInstallation;
 import com.parse.ParseUser;
 
 import java.util.Arrays;
@@ -56,6 +57,11 @@ public class LoginActivity extends Activity {
                     if (user.isNew()) {
                         updateProfile(user);
                     }
+
+                    ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+                    installation.put("user", user);
+                    installation.saveInBackground();
+
                     MainActivity.start(LoginActivity.this);
                 }
             }

@@ -7,6 +7,7 @@ import java.util.List;
 import retrofit.Callback;
 import retrofit.http.GET;
 import retrofit.http.Path;
+import retrofit.http.Query;
 
 /**
  * Created by fjcastor on 15-02-14.
@@ -21,7 +22,7 @@ public interface PeaceCorpsService {
     OpeningsWrapper getVolunteerOpenings();
 
     @GET("/openings")
-    void getVolunteerOpening(Callback<OpeningsWrapper> response);
+    void getVolunteerOpening(@Query("page_size") int pageSize, @Query("page") int page, Callback<OpeningsWrapper> response);
 
     @GET("/openings/{req_id}")
     VolunteerOpening getVolunteerOpening(@Path("req_id") String req_id);

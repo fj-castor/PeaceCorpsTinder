@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.andtinder.model.CardModel;
 import com.andtinder.view.CardContainer;
@@ -27,9 +31,14 @@ import com.blueoxfords.models.Image;
 import com.blueoxfords.models.KeywordPairing;
 import com.blueoxfords.models.VolunteerOpening;
 import com.blueoxfords.peacecorpstinder.R;
+import com.parse.FindCallback;
+import com.blueoxfords.peacecorpstinder.activities.MatchActivity;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -49,8 +58,8 @@ public class TinderFragment extends Fragment {
     private static Context context;
     private static Activity activity;
     private static int cardCount = 0;
-    private static int startIndex = 0;
-    private static int endIndex = 5;
+    private static int page = 1;
+    private static final int pageSize = 5;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -61,14 +70,24 @@ public class TinderFragment extends Fragment {
         context = this.getActivity();
         activity = this.getActivity();
 
-        loadCards();
-
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        page = sharedPreferences.getInt("page", 1);
+
+        loadCards();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+        editor.putInt("page", page);
+        editor.commit();
     }
 
     public static void match(View view, VolunteerOpening opening) {
@@ -98,12 +117,12 @@ public class TinderFragment extends Fragment {
 
         final HashMap<String, VolunteerOpening>idMap = new HashMap<String, VolunteerOpening>();
         final HashMap<String, Integer>scoreMap = new HashMap<String, Integer>();
-        PeaceCorpsRestClient.get().getVolunteerOpening(new Callback<PeaceCorpsService.OpeningsWrapper>() {
+        PeaceCorpsRestClient.get().getVolunteerOpening(pageSize, page, new Callback<PeaceCorpsService.OpeningsWrapper>() {
             @Override
             public void success(PeaceCorpsService.OpeningsWrapper openingsWrapper, Response response) {
 
-                List<VolunteerOpening> volunteerOpeningList = openingsWrapper.results.subList(startIndex, endIndex);
-                List<KeywordPairing> keywordPairingList = KeywordGenerator.generate(volunteerOpeningList);
+                List<VolunteerOpening> volunteerOpeningList = openingsWrapper.results;
+                final List<KeywordPairing> keywordPairingList = KeywordGenerator.generate(volunteerOpeningList);
 
                 int index = 0;
                 for (KeywordPairing opening : keywordPairingList) {
@@ -155,9 +174,8 @@ public class TinderFragment extends Fragment {
                                         Log.d("OHSHIT", "YOU GOT MATCHED UP WITH "+idMap.get(id).title + " " + idMap.get(id).country);
                                         match(topCard, idMap.get(id), url);
                                     }
-                                    if (cardCount >= 10) {
-                                        startIndex += 5;
-                                        endIndex += 5;
+                                    if (cardCount >= keywordPairingList.size()) {
+                                        page += 1;
                                         loadCards();
                                         cardCount = 0;
                                     }
@@ -166,9 +184,8 @@ public class TinderFragment extends Fragment {
                                 @Override
                                 public void onLike(View topCard) {
                                       cardCount ++;
-                                    if (cardCount >= 10) {
-                                        startIndex += 5;
-                                        endIndex += 5;
+                                    if (cardCount >= keywordPairingList.size()) {
+                                        page += 1;
                                         loadCards();
                                         cardCount = 0;
                                     }
@@ -186,18 +203,21 @@ public class TinderFragment extends Fragment {
 
                         @Override
                         public void failure(RetrofitError error) {
+                            error.printStackTrace();
                         }
                     });
                 }
             }
             @Override
             public void failure(RetrofitError error) {
-
+                error.printStackTrace();
             }
         });
     }
 
-    public static void match(View view, final VolunteerOpening opening, String url) {
+    private String latestMatchObjectId = null;
+
+    public void match(View view, final VolunteerOpening opening, String url) {
         AlertDialog.Builder builder = new AlertDialog.Builder(TinderFragment.context);
         ImageView iv = (ImageView) view.findViewById(R.id.image);
         ((LinearLayout) iv.getParent()).removeView(iv);
@@ -205,6 +225,7 @@ public class TinderFragment extends Fragment {
         ParseQuery<ParseObject> openingQ = ParseQuery.getQuery("Match");
         openingQ.whereEqualTo("opening", opening.req_id);
         openingQ.whereEqualTo("user2", null);
+        openingQ.whereNotEqualTo("user1", ParseUser.getCurrentUser());
 
         final String urls = url;
 
@@ -220,16 +241,53 @@ public class TinderFragment extends Fragment {
                     newMatch.put("pictureUrl", urls);
                     newMatch.put("country", opening.country);
 
-                    newMatch.saveInBackground();
+                    try {
+                        newMatch.save();
+                        latestMatchObjectId = newMatch.getObjectId();
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
 
                     Log.d("score", "The getFirst request failed.");
                 } else {
                     // doc exists add to user2
 
                     object.put("user2", ParseUser.getCurrentUser());
-                    object.saveInBackground();
+                    try {
+                        object.save();
+                        latestMatchObjectId = object.getObjectId();
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
 
-                    Log.d("score", "Retrieved the object.");
+                    ParseUser user1 = (ParseUser) object.get("user1");
+                    ParseUser curUser = ParseUser.getCurrentUser();
+
+                    try {
+                        user1.fetchIfNeeded();
+
+                        // Create our Installation query
+                        ParseQuery pushQuery = ParseInstallation.getQuery();
+                        pushQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+
+                        ParseQuery pushQueryToMatch = ParseInstallation.getQuery();
+                        pushQueryToMatch.whereEqualTo("user", object.get("user1"));
+
+                        // Send push notification to query
+                        ParsePush push = new ParsePush();
+                        push.setQuery(pushQuery); // Set our Installation query
+                        push.setMessage("You've been matched with " + user1.getString("nickname") + "!");
+                        push.sendInBackground();
+
+                        ParsePush pushToMatch = new ParsePush();
+                        pushToMatch.setQuery(pushQueryToMatch); // Set our Installation query
+                        pushToMatch.setMessage("You've been matched with " + curUser.getString("nickname") + "!");
+                        pushToMatch.sendInBackground();
+                    } catch (ParseException es) {
+                        es.printStackTrace();
+                    }
+
+
                 }
             }
         });
@@ -237,9 +295,9 @@ public class TinderFragment extends Fragment {
 
         builder.setTitle("You've been matched with \n " + opening.title + "\n");
         // Add the buttons
-        builder.setPositiveButton("View matches!", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("View match!", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                
+                MatchActivity.start(getActivity(), latestMatchObjectId);
             }
         });
         builder.setNegativeButton("Keep swiping!", new DialogInterface.OnClickListener() {
