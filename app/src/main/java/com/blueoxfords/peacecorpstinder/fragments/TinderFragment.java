@@ -4,7 +4,10 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -50,8 +53,8 @@ public class TinderFragment extends Fragment {
     private static Context context;
     private static Activity activity;
     private static int cardCount = 0;
-    private static int startIndex = 0;
-    private static int endIndex = 5;
+    private static int page = 1;
+    private static final int pageSize = 5;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -62,14 +65,23 @@ public class TinderFragment extends Fragment {
         context = this.getActivity();
         activity = this.getActivity();
 
-        loadCards();
-
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        page = sharedPreferences.getInt("page", 1);
+        loadCards();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+        editor.putInt("page", page);
+        editor.commit();
     }
 
     public static void match(View view, VolunteerOpening opening) {
@@ -99,12 +111,12 @@ public class TinderFragment extends Fragment {
 
         final HashMap<String, VolunteerOpening>idMap = new HashMap<String, VolunteerOpening>();
         final HashMap<String, Integer>scoreMap = new HashMap<String, Integer>();
-        PeaceCorpsRestClient.get().getVolunteerOpening(new Callback<PeaceCorpsService.OpeningsWrapper>() {
+        PeaceCorpsRestClient.get().getVolunteerOpening(pageSize, page, new Callback<PeaceCorpsService.OpeningsWrapper>() {
             @Override
             public void success(PeaceCorpsService.OpeningsWrapper openingsWrapper, Response response) {
 
-                List<VolunteerOpening> volunteerOpeningList = openingsWrapper.results.subList(startIndex, endIndex);
-                List<KeywordPairing> keywordPairingList = KeywordGenerator.generate(volunteerOpeningList);
+                List<VolunteerOpening> volunteerOpeningList = openingsWrapper.results;
+                final List<KeywordPairing> keywordPairingList = KeywordGenerator.generate(volunteerOpeningList);
 
                 int index = 0;
                 for (KeywordPairing opening : keywordPairingList) {
@@ -154,9 +166,8 @@ public class TinderFragment extends Fragment {
                                         Log.d("OHSHIT", "YOU GOT MATCHED UP WITH "+idMap.get(id).title + " " + idMap.get(id).country);
                                         match(topCard, idMap.get(id), url);
                                     }
-                                    if (cardCount >= 10) {
-                                        startIndex += 5;
-                                        endIndex += 5;
+                                    if (cardCount >= keywordPairingList.size()) {
+                                        page += 1;
                                         loadCards();
                                         cardCount = 0;
                                     }
@@ -165,9 +176,8 @@ public class TinderFragment extends Fragment {
                                 @Override
                                 public void onLike(View topCard) {
                                       cardCount ++;
-                                    if (cardCount >= 10) {
-                                        startIndex += 5;
-                                        endIndex += 5;
+                                    if (cardCount >= keywordPairingList.size()) {
+                                        page += 1;
                                         loadCards();
                                         cardCount = 0;
                                     }
@@ -185,13 +195,14 @@ public class TinderFragment extends Fragment {
 
                         @Override
                         public void failure(RetrofitError error) {
+                            error.printStackTrace();
                         }
                     });
                 }
             }
             @Override
             public void failure(RetrofitError error) {
-
+                error.printStackTrace();
             }
         });
     }
