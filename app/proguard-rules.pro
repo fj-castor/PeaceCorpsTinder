@@ -15,3 +15,12 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-keep class com.facebook.** { *; }
+-keepattributes Signature
+
+-keep class retrofit.** { *; }
+-keep class package.with.model.classes.** { *; }
+-keepclassmembernames interface * {
+    @retrofit.http.* <methods>;
+}
