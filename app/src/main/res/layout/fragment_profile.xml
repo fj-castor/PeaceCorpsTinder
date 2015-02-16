@@ -2,13 +2,14 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent" >
 
     <ImageView
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:id="@+id/profile"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -23,6 +24,15 @@
         android:layout_height="wrap_content"
         android:text="Sign Out"
         android:id="@+id/signOutButton"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/about"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/about"
+        android:layout_marginTop="30dp" />
 
 </LinearLayout>
