@@ -70,13 +70,13 @@ android:layout_height="wrap_content">
             android:textColor="@android:color/secondary_text_light"
             tools:text="This is the description, it is a long description, as you can see"/>
 
-        <ImageButton
+        <TextView
             android:id="@+id/photo_id"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="?android:attr/selectableItemBackground"
             android:padding="10dp"
-            android:src="@drawable/people"
+            android:text="@string/image_info"
             android:onClick="getLegalInfo"/>
 
     </LinearLayout>
