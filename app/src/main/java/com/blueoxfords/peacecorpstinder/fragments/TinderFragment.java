@@ -32,6 +32,7 @@ import com.blueoxfords.models.KeywordPairing;
 import com.blueoxfords.models.VolunteerOpening;
 import com.blueoxfords.peacecorpstinder.R;
 import com.parse.FindCallback;
+import com.blueoxfords.peacecorpstinder.activities.MatchActivity;
 import com.parse.GetCallback;
 import com.parse.Parse;
 import com.parse.ParseException;
@@ -213,7 +214,9 @@ public class TinderFragment extends Fragment {
         });
     }
 
-    public static void match(View view, final VolunteerOpening opening, String url) {
+    private String latestMatchObjectId = null;
+
+    public void match(View view, final VolunteerOpening opening, String url) {
         AlertDialog.Builder builder = new AlertDialog.Builder(TinderFragment.context);
         ImageView iv = (ImageView) view.findViewById(R.id.image);
         ((LinearLayout) iv.getParent()).removeView(iv);
@@ -237,14 +240,24 @@ public class TinderFragment extends Fragment {
                     newMatch.put("pictureUrl", urls);
                     newMatch.put("country", opening.country);
 
-                    newMatch.saveInBackground();
+                    try {
+                        newMatch.save();
+                        latestMatchObjectId = newMatch.getObjectId();
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
 
                     Log.d("score", "The getFirst request failed.");
                 } else {
                     // doc exists add to user2
 
                     object.put("user2", ParseUser.getCurrentUser());
-                    object.saveInBackground();
+                    try {
+                        object.save();
+                        latestMatchObjectId = object.getObjectId();
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    }
 
                     ParseUser user1 = (ParseUser) object.get("user1");
                     ParseUser curUser = ParseUser.getCurrentUser();
@@ -281,9 +294,9 @@ public class TinderFragment extends Fragment {
 
         builder.setTitle("You've been matched with \n " + opening.title + "\n");
         // Add the buttons
-        builder.setPositiveButton("View matches!", new DialogInterface.OnClickListener() {
+        builder.setPositiveButton("View match!", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                
+                MatchActivity.start(getActivity(), latestMatchObjectId);
             }
         });
         builder.setNegativeButton("Keep swiping!", new DialogInterface.OnClickListener() {

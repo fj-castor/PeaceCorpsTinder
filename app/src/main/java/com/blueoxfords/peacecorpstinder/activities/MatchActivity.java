@@ -157,7 +157,7 @@ public class MatchActivity extends FragmentActivity implements ActionBar.TabList
         }
 
         public Drawable getPageIcon(int position) {
-            Drawable icon = context.getResources().obtainTypedArray(R.array.tab_icons).getDrawable(position);
+            Drawable icon = context.getResources().obtainTypedArray(R.array.match_tab_icons).getDrawable(position);
             icon.setColorFilter(context.getResources().getColor(R.color.tab_icon_unselected_grey), PorterDuff.Mode.SRC_ATOP);
             return icon;
         }
