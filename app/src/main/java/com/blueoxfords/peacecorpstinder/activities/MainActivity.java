@@ -206,6 +206,10 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
                     infoLayout.addView(description);
                 }
 
+                TextView contact = new TextView(MainActivity.activity);
+                contact.setText(Html.fromHtml("<br><i>To remove this photo, please email peacecorpstinder@gmail.com</i>"));
+                infoLayout.addView(contact);
+
                 wrapper.addView(infoLayout);
 
                 builder.setTitle("Photo Information");
