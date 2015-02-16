@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.andtinder.model.CardModel;
 import com.andtinder.view.CardContainer;
@@ -30,9 +31,13 @@ import com.blueoxfords.models.Image;
 import com.blueoxfords.models.KeywordPairing;
 import com.blueoxfords.models.VolunteerOpening;
 import com.blueoxfords.peacecorpstinder.R;
+import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParsePush;
 import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
@@ -73,6 +78,7 @@ public class TinderFragment extends Fragment {
         super.onCreate(savedInstanceState);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         page = sharedPreferences.getInt("page", 1);
+
         loadCards();
     }
 
@@ -215,6 +221,7 @@ public class TinderFragment extends Fragment {
         ParseQuery<ParseObject> openingQ = ParseQuery.getQuery("Match");
         openingQ.whereEqualTo("opening", opening.req_id);
         openingQ.whereEqualTo("user2", null);
+        openingQ.whereNotEqualTo("user1", ParseUser.getCurrentUser());
 
         final String urls = url;
 
@@ -239,7 +246,34 @@ public class TinderFragment extends Fragment {
                     object.put("user2", ParseUser.getCurrentUser());
                     object.saveInBackground();
 
-                    Log.d("score", "Retrieved the object.");
+                    ParseUser user1 = (ParseUser) object.get("user1");
+                    ParseUser curUser = ParseUser.getCurrentUser();
+
+                    try {
+                        user1.fetchIfNeeded();
+
+                        // Create our Installation query
+                        ParseQuery pushQuery = ParseInstallation.getQuery();
+                        pushQuery.whereEqualTo("user", ParseUser.getCurrentUser());
+
+                        ParseQuery pushQueryToMatch = ParseInstallation.getQuery();
+                        pushQueryToMatch.whereEqualTo("user", object.get("user1"));
+
+                        // Send push notification to query
+                        ParsePush push = new ParsePush();
+                        push.setQuery(pushQuery); // Set our Installation query
+                        push.setMessage("You've been matched with " + user1.getString("nickname") + "!");
+                        push.sendInBackground();
+
+                        ParsePush pushToMatch = new ParsePush();
+                        pushToMatch.setQuery(pushQueryToMatch); // Set our Installation query
+                        pushToMatch.setMessage("You've been matched with " + curUser.getString("nickname") + "!");
+                        pushToMatch.sendInBackground();
+                    } catch (ParseException es) {
+                        es.printStackTrace();
+                    }
+
+
                 }
             }
         });
