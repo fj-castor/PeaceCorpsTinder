@@ -18,4 +18,9 @@
         <item>@string/tab_opening_match_title</item>
     </array>
 
+    <array name="match_tab_icons">
+        <item>@drawable/swipselogo</item>
+        <item>@drawable/chat</item>
+    </array>
+
 </resources>
