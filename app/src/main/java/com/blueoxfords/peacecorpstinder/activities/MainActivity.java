@@ -1,8 +1,11 @@
 package com.blueoxfords.peacecorpstinder.activities;
 
 import android.app.ActionBar;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -12,7 +15,16 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
 
+import com.blueoxfords.ImageRestClient;
+import com.blueoxfords.ImageService;
 import com.blueoxfords.peacecorpstinder.R;
 import com.blueoxfords.peacecorpstinder.fragments.MatchFragment;
 import com.blueoxfords.peacecorpstinder.fragments.ProfileFragment;
@@ -20,12 +32,17 @@ import com.blueoxfords.peacecorpstinder.fragments.TinderFragment;
 import com.parse.ParseFacebookUtils;
 import com.parse.ParseUser;
 
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 
 public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
 
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
 
     ViewPager mViewPager;
+    public static Activity activity;
 
     public static void start(Context c) {
         c.startActivity(new Intent(c, MainActivity.class));
@@ -35,6 +52,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        activity = this;
 
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(this, getSupportFragmentManager());
 
@@ -141,5 +159,88 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ParseFacebookUtils.finishAuthentication(requestCode, resultCode, data);
+    }
+
+    public void getLegalInfo(View v) {
+        String photoId = v.getTag() + "";
+        ImageRestClient.get().getInfoFromImageId(photoId, new Callback<ImageService.ImageInfoWrapper>() {
+            @Override
+            public void success(ImageService.ImageInfoWrapper imageInfoWrapper, Response response) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.activity);
+
+                ScrollView wrapper = new ScrollView(MainActivity.activity);
+                LinearLayout infoLayout = new LinearLayout(MainActivity.activity);
+                infoLayout.setOrientation(LinearLayout.VERTICAL);
+                infoLayout.setPadding(35, 35, 35, 35);
+
+                TextView imageOwner = new TextView(MainActivity.activity);
+                imageOwner.setText(Html.fromHtml("<b>Image By: </b>" + imageInfoWrapper.photo.owner.username));
+                if (imageInfoWrapper.photo.owner.realname.length() > 0) {
+                    imageOwner.setText(imageOwner.getText() + " (" + imageInfoWrapper.photo.owner.realname + ")");
+                }
+                infoLayout.addView(imageOwner);
+
+                if (getLicenseUrl(Integer.parseInt(imageInfoWrapper.photo.license)).length() > 0) {
+                    TextView licenseLink = new TextView(MainActivity.activity);
+                    licenseLink.setText(Html.fromHtml("<a href=\"" + getLicenseUrl(Integer.parseInt(imageInfoWrapper.photo.license)) + "\"><b>Licensing</b></a>"));
+                    licenseLink.setMovementMethod(LinkMovementMethod.getInstance());
+                    infoLayout.addView(licenseLink);
+                }
+
+                if (imageInfoWrapper.photo.urls.url.size() > 0) {
+                    TextView imageLink = new TextView(MainActivity.activity);
+                    imageLink.setText(Html.fromHtml("<a href=\"" + imageInfoWrapper.photo.urls.url.get(0)._content + "\"><b>Image Link</b></a>"));
+                    imageLink.setMovementMethod(LinkMovementMethod.getInstance());
+                    infoLayout.addView(imageLink);
+                }
+
+                if (imageInfoWrapper.photo.title._content.length() > 0) {
+                    TextView photoTitle = new TextView(MainActivity.activity);
+                    photoTitle.setText(Html.fromHtml("<b>Image Title: </b>" + imageInfoWrapper.photo.title._content));
+                    infoLayout.addView(photoTitle);
+                }
+
+                if (imageInfoWrapper.photo.description._content.length() > 0) {
+                    TextView description = new TextView(MainActivity.activity);
+                    description.setText(Html.fromHtml("<b>Image Description: </b>" + imageInfoWrapper.photo.description._content));
+                    infoLayout.addView(description);
+                }
+
+                wrapper.addView(infoLayout);
+
+                builder.setTitle("Photo Information");
+                builder.setPositiveButton("Close", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+
+                    }
+                });
+                builder.setView(wrapper);
+                builder.create().show();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                Log.i("testing", "could not retrieve legal/attribution info");
+            }
+        });
+    }
+
+    public static String getLicenseUrl(int id) {
+        switch (id) {
+            case 1:
+                return "http://creativecommons.org/licenses/by-nc-sa/2.0/legalcode";
+            case 2:
+                return "http://creativecommons.org/licenses/by-nc-nd/2.0/legalcode";
+            case 3:
+                return "http://creativecommons.org/licenses/by-nc-nd/2.0/legalcode";
+            case 4:
+                return "http://creativecommons.org/licenses/by/2.0/legalcode";
+            case 5:
+                return "http://creativecommons.org/licenses/by-sa/2.0/legalcode";
+            case 6:
+                return "http://creativecommons.org/licenses/by-nd/2.0/legalcode";
+            default:
+                return "";
+        }
     }
 }

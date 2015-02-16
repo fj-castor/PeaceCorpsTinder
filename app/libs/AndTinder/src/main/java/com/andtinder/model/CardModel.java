@@ -35,6 +35,7 @@ public class CardModel {
     public  String   url;
     public int id;
     public String req_id;
+    public String photo_id;
     public VolunteerOpening opening;
 	private Drawable cardImageDrawable;
 	private Drawable cardLikeImageDrawable;
@@ -69,13 +70,14 @@ public class CardModel {
 		this.cardImageDrawable = new BitmapDrawable(null, cardImage);
 	}
 
-    public CardModel(String title, String description, String url, int id, VolunteerOpening opening) {
+    public CardModel(String title, String description, String url, int id, VolunteerOpening opening, String photo_id) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.url = url;
         this.opening = opening;
         this.req_id = opening.req_id;
+        this.photo_id = photo_id;
     }
 
 	public String getTitle() {

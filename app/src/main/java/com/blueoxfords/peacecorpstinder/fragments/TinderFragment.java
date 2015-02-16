@@ -45,7 +45,6 @@ import retrofit.client.Response;
  */
 public class TinderFragment extends Fragment {
 
-
     private CardContainer mCardContainer;
     private static Context context;
     private static Activity activity;
@@ -117,20 +116,22 @@ public class TinderFragment extends Fragment {
                     Log.d("Pairing", pairing.volunteerOpening.title);
 
                     String keyword = opening.keyword;
-                    Log.wtf("testingg", keyword);
 
                     ImageRestClient.get().getImagesFromKeyword(keyword, new Callback<ImageService.ImageResponseWrapper>() {
                         @Override
                         public void success(ImageService.ImageResponseWrapper imageResponseWrapper, Response response) {
                             List<Image> images = imageResponseWrapper.photos.photo;
                             String url = "http://i.imgur.com/DvpvklR.png";
+                            String photoId = "";
                             if (images.size() > 0) {
                                 Log.d("TESTING", images.get(0).url_m);
                                 url = images.get(0).url_m;
+                                photoId = images.get(0).id;
+                                Log.d("testing", photoId+"");
                             }
-                            final CardModel card = new CardModel(pairing.volunteerOpening.title, pairing.keyword, url, indice, pairing.volunteerOpening);
-                            Log.d("PairName", pairing.volunteerOpening.title + " " + pairing.volunteerOpening.country);
 
+                            final CardModel card = new CardModel(pairing.volunteerOpening.title, pairing.keyword, url, indice, pairing.volunteerOpening, photoId);
+                            Log.d("PairName", pairing.volunteerOpening.title + " " + pairing.volunteerOpening.country);
 
                             card.setOnCardDimissedListener(new CardModel.OnCardDimissedListener() {
 
