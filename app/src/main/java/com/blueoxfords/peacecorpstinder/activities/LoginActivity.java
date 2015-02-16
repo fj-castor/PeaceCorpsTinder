@@ -1,4 +1,4 @@
-package com.blueoxfords.peacecorpstinder;
+package com.blueoxfords.peacecorpstinder.activities;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +8,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.blueoxfords.peacecorpstinder.Constants;
+import com.blueoxfords.peacecorpstinder.R;
 import com.facebook.Request;
 import com.facebook.Response;
 import com.facebook.model.GraphUser;

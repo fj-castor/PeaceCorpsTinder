@@ -1,4 +1,4 @@
-package com.blueoxfords.peacecorpstinder;
+package com.blueoxfords.peacecorpstinder.fragments;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -26,6 +26,7 @@ import com.blueoxfords.PeaceCorpsService;
 import com.blueoxfords.models.Image;
 import com.blueoxfords.models.KeywordPairing;
 import com.blueoxfords.models.VolunteerOpening;
+import com.blueoxfords.peacecorpstinder.R;
 import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;

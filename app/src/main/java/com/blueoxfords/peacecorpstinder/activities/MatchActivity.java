@@ -1,12 +1,9 @@
-package com.blueoxfords.peacecorpstinder;
+package com.blueoxfords.peacecorpstinder.activities;
 
 import android.app.ActionBar;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,27 +12,38 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.util.Base64;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.blueoxfords.peacecorpstinder.R;
+import com.blueoxfords.peacecorpstinder.fragments.ChatFragment;
+import com.blueoxfords.peacecorpstinder.fragments.OpeningDetailsFragment;
+import com.parse.ParseException;
 import com.parse.ParseFacebookUtils;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
-
-public class MainActivity extends FragmentActivity implements ActionBar.TabListener {
+public class MatchActivity extends FragmentActivity implements ActionBar.TabListener {
 
     AppSectionsPagerAdapter mAppSectionsPagerAdapter;
 
     ViewPager mViewPager;
 
-    public static void start(Context c) {
-        c.startActivity(new Intent(c, MainActivity.class));
+    String matchId;
+
+    ParseObject match;
+
+    boolean personMatched;
+
+    public static void start(Context c, String matchId) {
+        c.startActivity(new Intent(c, MatchActivity.class).putExtra("matchId", matchId));
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putString("matchId", matchId);
+        super.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -43,12 +51,27 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (savedInstanceState != null) {
+            matchId = savedInstanceState.getString("matchId");
+        } else {
+            matchId = getIntent().getStringExtra("matchId");
+        }
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Match");
+        try {
+            match = query.get(matchId);
+            personMatched = match.get("user1") != null && match.get("user2") != null;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Toast.makeText(MatchActivity.this, "Something went wrong fetching the match", Toast.LENGTH_LONG).show();
+            finish();
+        }
+
         mAppSectionsPagerAdapter = new AppSectionsPagerAdapter(this, getSupportFragmentManager());
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
         mViewPager.setAdapter(mAppSectionsPagerAdapter);
-        mViewPager.setOffscreenPageLimit(2);
-
+        mViewPager.setOffscreenPageLimit(1);
 
         final ActionBar actionBar = getActionBar();
 
@@ -57,13 +80,13 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             actionBar.setTitle(getString(R.string.app_name));
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-
             mViewPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
                 @Override
                 public void onPageSelected(int position) {
                     actionBar.setSelectedNavigationItem(position);
                 }
             });
+
             for (int i = 0; i < mAppSectionsPagerAdapter.getCount(); i++) {
                 actionBar.addTab(
                         actionBar.newTab()
@@ -100,7 +123,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
     public void onTabReselected(ActionBar.Tab tab, FragmentTransaction ft) {
     }
 
-    public static class AppSectionsPagerAdapter extends FragmentPagerAdapter {
+    public class AppSectionsPagerAdapter extends FragmentPagerAdapter {
 
         Context context;
 
@@ -111,20 +134,17 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         @Override
         public int getCount() {
-            return 3;
+            return personMatched ? 2 : 1;
         }
 
         @Override
         public Fragment getItem(int i) {
             switch (i) {
                 case 0:
-                    return TinderFragment.instantiate(context, TinderFragment.class.getName());
+                    return OpeningDetailsFragment.newInstance(match.getString("opening"), matchId);
 
                 case 1:
-                    return MatchFragment.instantiate(context, MatchFragment.class.getName());
-
-                case 2:
-                    return ProfileFragment.instantiate(context,ProfileFragment.class.getName());
+                    return ChatFragment.newInstance(matchId);
 
                 default:
                     return null;
@@ -133,7 +153,7 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
 
         @Override
         public CharSequence getPageTitle(int position) {
-            return context.getResources().obtainTypedArray(R.array.tab_titles).getString(position);
+            return context.getResources().obtainTypedArray(R.array.match_tab_titles).getString(position);
         }
 
         public Drawable getPageIcon(int position) {
@@ -142,7 +162,6 @@ public class MainActivity extends FragmentActivity implements ActionBar.TabListe
             return icon;
         }
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {

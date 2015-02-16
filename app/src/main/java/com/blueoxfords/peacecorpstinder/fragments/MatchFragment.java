@@ -1,4 +1,4 @@
-package com.blueoxfords.peacecorpstinder;
+package com.blueoxfords.peacecorpstinder.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -14,6 +14,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.blueoxfords.peacecorpstinder.R;
+import com.blueoxfords.peacecorpstinder.activities.MatchActivity;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
