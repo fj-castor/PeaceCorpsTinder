@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Peace Corps Tinder</string>
+    <string name="app_name">Peace Corps Connect</string>
     <string name="title_section1">Section 1</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
@@ -17,16 +17,15 @@
     <string name="tab_opening_match_title">Match</string>
 
     <string name="about"><u>About Peace Corps Connect</u></string>
-    <string name="about_text">Made for IDHacks 2015 by Soheil Koushan, George Ke, Aline Mitsuzawa, and Francis Castor.
-For more info, see our <a href='http://challengepost.com/software/tinder-for-peace-corps'>Challenge Post</a>.
-Libraries:
-
-<a href='https://github.com/kikoso/Swipeable-Cards/'>Swipeable-Cards by kikosi</a> <a href='http://www.apache.org/licenses/LICENSE-2.0'>(License)</a>,
-
-<a href='https://github.com/PeaceCorps/Volunteer-Openings-API'>Peace Corps Volunteering Openings API</a>,
-
-<a href='https://www.flickr.com/services/api/'>Flickr API</a>,
-
+    <string name="about_text">Made for IDHacks 2015 by Soheil Koushan, George Ke, Aline Mitsuzawa, and Francis Castor.\n\n
+Libraries used:
+\n
+<a href='https://github.com/kikoso/Swipeable-Cards/'>Swipeable-Cards by kikosi</a> <a href='http://www.apache.org/licenses/LICENSE-2.0'>(License)</a>
+\n
+<a href='https://github.com/PeaceCorps/Volunteer-Openings-API'>Peace Corps Openings API</a>
+\n
+<a href='https://www.flickr.com/services/api/'>Flickr API</a>
+\n
 <a href='https://www.parse.com/'>Parse</a>
     </string>
 </resources>
