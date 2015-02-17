@@ -1,4 +1,4 @@
-# Tinder for Peace Corps
+# Peace Corps Connect
 
 Made for [IDHacks 2015](http://idhack.developersfordevelopment.org/) by Soheil Koushan, George Ke, Amile Mitsuzawa, and Francis Castor.
 
